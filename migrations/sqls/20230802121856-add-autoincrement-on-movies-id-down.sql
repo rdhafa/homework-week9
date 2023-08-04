@@ -1,0 +1,1 @@
+DROP SEQUENCE movies_id_seq CASCADE;

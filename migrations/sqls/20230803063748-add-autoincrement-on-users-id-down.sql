@@ -1,0 +1,1 @@
+DROP SEQUENCE users_id_seq CASCADE;
