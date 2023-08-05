@@ -1,0 +1,1019 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Movies and Users API",
+    "description": "API for Homework Week 9",
+    "termsOfService": "http://swagger.io/terms/",
+    "contact": {
+      "email": "apiteam@swagger.io"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version": "1.0.0"
+  },
+  "externalDocs": {
+    "description": "Find out more about Swagger",
+    "url": "http://swagger.io"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Movies",
+      "description": "Movies APIs"
+    },
+    {
+      "name": "Users",
+      "description": "Operations about users"
+    }
+  ],
+  "paths": {
+    "/movies": {
+      "get": {
+        "tags": [
+          "Movies"
+        ],
+        "summary": "List movies",
+        "description": "List all movies and paginates if desired",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The page you want to show (optional)"
+          },
+          {
+            "in": "query",
+            "name": "size",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "How much data you want to show (optional)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Movies"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No token passed in request headers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Token expired when authenticating",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Movie not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFound"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "loginAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Movies"
+        ],
+        "summary": "Add a movie",
+        "description": "Add movie to table movie",
+        "requestBody": {
+          "description": "Add a new movie",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "title",
+                  "genres",
+                  "year"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "example": 101,
+                    "description": "required if not migrating table movies"
+                  },
+                  "title": {
+                    "type": "string",
+                    "example": "Pixel"
+                  },
+                  "genres": {
+                    "type": "string",
+                    "example": "Action|Comedy|Sci-Fi"
+                  },
+                  "year": {
+                    "type": "integer",
+                    "example": 2015
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Created"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request body does not match requirement",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequest"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No token passed in request headers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Token expired when authenticating",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "loginAuth": []
+          }
+        ]
+      }
+    },
+    "/movies/{id}": {
+      "get": {
+        "tags": [
+          "Movies"
+        ],
+        "summary": "Find movie by id",
+        "description": "Returns a single movie",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Movie id you want to find",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Movies"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No token passed in request headers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Token expired when authenticating",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Movie not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFound"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "loginAuth": []
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Movies"
+        ],
+        "summary": "Edit a movie",
+        "description": "Edit datas in movie",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Movie id you want to edit",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "description": "Edit existing movie, cannot edit id",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "example": "PIXEL"
+                  },
+                  "genres": {
+                    "type": "string",
+                    "example": "Action|Comedy|Sci-Fi|Family"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Edited"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request body does not match requirement",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequest"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No token passed in request headers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Token expired when authenticating or role not authorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Movie not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFound"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "loginAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Movies"
+        ],
+        "summary": "Delete a movie",
+        "description": "Delete a movie from table movies",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Movie id you want to delete",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Deleted"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No token passed in request headers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Token expired when authenticating or role not authorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Movie not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFound"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "loginAuth": []
+          }
+        ]
+      }
+    },
+    "/users": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "List users",
+        "description": "List all users and paginates if desired",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The page you want to show (optional)"
+          },
+          {
+            "in": "query",
+            "name": "size",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "How much data you want to show (optional)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Users"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No token passed in request headers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Token expired when authenticating",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFound"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "loginAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Find user by id",
+        "description": "Returns a single user",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "User id you want to find",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Users"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No token passed in request headers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Token expired when authenticating",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFound"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "loginAuth": []
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Edit a user",
+        "description": "Edit user's credentials",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "User id you want to edit",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "description": "Edit existing user, cannot edit id",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "example": "insinyur5@insinyur.ins"
+                  },
+                  "gender": {
+                    "type": "string",
+                    "example": "FeMaleficent"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "insinyur321"
+                  },
+                  "role": {
+                    "type": "string",
+                    "example": "Junior Engineer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Edited"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request body does not match requirement",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequest"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No token passed in request headers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Token expired when authenticating or role not authorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFound"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "loginAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Delete a user",
+        "description": "Delete a user from table users",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "User id you want to delete",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Deleted"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No token passed in request headers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Token expired when authenticating or role not authorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFound"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "loginAuth": []
+          }
+        ]
+      }
+    },
+    "/users/register": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Register for user",
+        "description": "Register an account for user",
+        "requestBody": {
+          "description": "Register an account for user",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "gender",
+                  "password",
+                  "role"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "example": "insinyur@insinyur.ins"
+                  },
+                  "gender": {
+                    "type": "string",
+                    "example": "Maleficent"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "insinyur123"
+                  },
+                  "role": {
+                    "type": "string",
+                    "example": "Engineer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Registered",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Register successful!"
+                    },
+                    "email": {
+                      "type": "string",
+                      "example": "insinyur@insinyur.ins"
+                    },
+                    "role": {
+                      "type": "string",
+                      "example": "Engineer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request body does not match requirement",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequest"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/login": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Login for user",
+        "description": "Login for user",
+        "requestBody": {
+          "description": "Login for user",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "password"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "example": "insinyur@insinyur.ins"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "insinyur123"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Login successful!"
+                    },
+                    "token": {
+                      "type": "string",
+                      "example": "generatedToken"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request body does not match requirement",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequest"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Email or password invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Email or password invalid!"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Movies": {
+        "required": [
+          "id",
+          "title",
+          "genres",
+          "year"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 101
+          },
+          "title": {
+            "type": "string",
+            "example": "Pixel"
+          },
+          "genres": {
+            "type": "string",
+            "example": "Action|Comedy|Sci-Fi"
+          },
+          "year": {
+            "type": "integer",
+            "example": 2015
+          }
+        }
+      },
+      "Users": {
+        "required": [
+          "id",
+          "email",
+          "gender",
+          "password",
+          "role"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 101
+          },
+          "email": {
+            "type": "string",
+            "example": "insinyur@insinyur.ins"
+          },
+          "gender": {
+            "type": "string",
+            "example": "Maleficent"
+          },
+          "password": {
+            "type": "string",
+            "example": "insinyur123"
+          },
+          "role": {
+            "type": "string",
+            "example": "Engineer"
+          }
+        }
+      },
+      "Created": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Data created successfully!"
+          }
+        }
+      },
+      "Edited": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Data edited successfully!"
+          }
+        }
+      },
+      "Deleted": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Data deleted successfully!"
+          }
+        }
+      },
+      "AuthError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Token invalid!"
+          }
+        }
+      },
+      "NotFound": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Data not found!"
+          }
+        }
+      },
+      "BadRequest": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Bad request!"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "loginAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

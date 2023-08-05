@@ -1,14 +1,16 @@
 const router = require("express").Router();
 const pool = require("../config/config.js");
+const { authorization } = require("../middlewares/auth.js");
 
-// GET Pagination
+// List Movies with Pagination
 router.get("/", (req, res) => {
   const page = parseInt(req.query.page);
   const size = parseInt(req.query.size);
+
   if (!page || !size) {
     if (!page && !size) {
       pool.query(`SELECT * FROM movies ORDER BY id`, (err, result) => {
-        res.send(result.rows);
+        res.status(200).send(result.rows);
       });
     } else {
       res.status(400).send({ message: "Bad request!" });
@@ -24,13 +26,17 @@ router.get("/", (req, res) => {
       if (err) {
         console.error(err);
       } else {
-        res.send(result.rows);
+        if (result.rowCount === 0) {
+          res.status(404).send({ message: "Movie not found!" });
+        } else {
+          res.status(200).send(result.rows);
+        }
       }
     });
   }
 });
 
-// GET by id
+// List Movie by id
 router.get("/:id", (req, res) => {
   const { id } = req.params;
   const query = `SELECT * FROM movies WHERE id = $1`;
@@ -47,7 +53,7 @@ router.get("/:id", (req, res) => {
   });
 });
 
-// POST
+// Add Movie
 router.post("/", (req, res) => {
   const { title, genres } = req.body;
   const id = parseInt(req.body.id);
@@ -87,32 +93,49 @@ router.post("/", (req, res) => {
   }
 });
 
-// PATCH
-router.patch("/:id", (req, res) => {
-  const reqBody = Object.entries(req.body);
-  let isKeyValid = true;
+// Update Movie
+router.patch("/:id", authorization, (req, res) => {
   const { id } = req.params;
-  for (const [key, value] of reqBody) {
-    if (key === "title" || key === "genres" || key === "year") {
-      const query = `UPDATE movies SET ${key} = $1 WHERE id = $2`;
-      pool.query(query, [value, id], (err, result) => {
-        if (err) {
-          console.log(err);
-        }
-      });
+  const query = `SELECT * FROM movies WHERE id = $1`;
+  pool.query(query, [id], (err, result) => {
+    if (err) {
+      console.log(err);
     } else {
-      isKeyValid = false;
+      if (result.rowCount === 0) {
+        res.status(404).send({ message: "Movie does not exist!" });
+      } else {
+        const reqBody = Object.entries(req.body);
+        const reqBodyId = req.body.id;
+        if (reqBodyId) {
+          return res.status(400).send({ message: "Bad request!" });
+        }
+
+        let isKeyValid = true;
+
+        for (const [key, value] of reqBody) {
+          if (key === "title" || key === "genres" || key === "year") {
+            const query = `UPDATE movies SET ${key} = $1 WHERE id = $2`;
+            pool.query(query, [value, id], (err, result) => {
+              if (err) {
+                console.log(err);
+              }
+            });
+          } else {
+            isKeyValid = false;
+          }
+        }
+        if (isKeyValid) {
+          res.status(200).send({ message: "Movie updated successfully!" });
+        } else {
+          res.status(400).send({ message: "Bad request!" });
+        }
+      }
     }
-  }
-  if (isKeyValid) {
-    res.status(200).send({ message: "Update movie successful!" });
-  } else {
-    res.status(400).send({ message: "Bad request!" });
-  }
+  });
 });
 
-// DELETE
-router.delete("/:id", (req, res) => {
+// Delete Movie
+router.delete("/:id", authorization, (req, res) => {
   const { id } = req.params;
   const query = `DELETE FROM movies WHERE id = $1`;
   pool.query(query, [id], (err, result) => {
